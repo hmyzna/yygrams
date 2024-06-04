@@ -1,0 +1,3 @@
+/home/toxa/CLionProjects/yygrams/cmake-build-debug/CMakeFiles/yygrams.dir
+/home/toxa/CLionProjects/yygrams/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/toxa/CLionProjects/yygrams/cmake-build-debug/CMakeFiles/rebuild_cache.dir
