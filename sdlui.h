@@ -24,6 +24,6 @@ struct menuButton {
 
 int menuStart();
 
-int game(bool darkMode);
+int game(bool darkMode, std::string level);
 
 #endif //YYGRAMS_SDLUI_H

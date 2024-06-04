@@ -4,7 +4,7 @@
 using namespace std;
 
 void readNono(short *sln[15][15], string fileName, int *m, int *n) {
-    ifstream in("1.nono");
+    ifstream in(fileName);
     string line;
     *m = 0; *n = 0;
     bool firstrun = true;
@@ -69,9 +69,10 @@ void renderHint(int x, int y, short value, TTF_Font* font, SDL_Renderer* rend, b
     }
 
     SDL_Texture* text = SDL_CreateTextureFromSurface(rend, textSurface);
-    int textWidth = textSurface->w;
-    int textHeight = textSurface->h;
-    SDL_Rect renderQuad = { x, y, 22, 22 };
+    int textWidth = (textSurface->w);
+    int textHeight = (textSurface->h);
+    SDL_Rect renderQuad = { x, y, textWidth, textHeight };
+    if (value < 10) renderQuad.x+=6;
 
     SDL_RenderCopy(rend, text, nullptr, &renderQuad);
     SDL_DestroyTexture(text);
@@ -91,7 +92,7 @@ void renderCell(int x, int y, short state, SDL_Renderer* rend, bool darkMode) {
                 SDL_RenderFillRect(rend, &insidepart);
             }
             else {
-                SDL_SetRenderDrawColor(rend, 130, 130, 130, 0);
+                SDL_SetRenderDrawColor(rend, 170, 170, 170, 0);
                 SDL_RenderFillRect(rend, &outline);
                 SDL_SetRenderDrawColor(rend, 230, 230, 230, 0);
                 SDL_RenderFillRect(rend, &insidepart);
@@ -108,7 +109,7 @@ void renderCell(int x, int y, short state, SDL_Renderer* rend, bool darkMode) {
             }
             else {
 
-                SDL_SetRenderDrawColor(rend, 120, 120, 120, 0);
+                SDL_SetRenderDrawColor(rend, 70, 70, 70, 0);
                 SDL_RenderFillRect(rend, &outline);
                 SDL_SetRenderDrawColor(rend, 30, 30, 30, 0);
                 SDL_RenderFillRect(rend, &insidepart);
@@ -156,7 +157,7 @@ int menuStart() {
     bool darkMode = false;
     SDL_Window* win = SDL_CreateWindow("Menu",
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          400, 600, flags);
+                                          400, 300, flags);
     SDL_Renderer* rend = SDL_CreateRenderer(win, -1, 0);
     SDL_SetRenderDrawColor(rend, 250, 250, 250, 0);
     SDL_RenderClear(rend);
@@ -169,8 +170,14 @@ int menuStart() {
     //renderButton(rend, darkMode, toggleDarkMode);
     //SDL_RenderPresent(rend);
 
-    menuButton toggleMusic;
-    toggleMusic.pos = {50, 90, 300, 70};
+    menuButton level1;
+    level1.pos = {50, 100, 140, 70};
+    menuButton level2;
+    level2.pos = {210, 100, 140, 70};
+    menuButton level3;
+    level3.pos = {50, 190, 140, 70};
+    menuButton level4;
+    level4.pos = {210, 190, 140, 70};
 
 
     SDL_Event ev;
@@ -186,11 +193,27 @@ int menuStart() {
                     if (darkMode) darkMode = false;
                     else darkMode = true;
                 }
-                if (isClicked(ev.button.x, ev.button.y, toggleMusic.pos)) {
+                if (isClicked(ev.button.x, ev.button.y, level1.pos)) {
                     SDL_HideWindow(win);
-                    game(darkMode);
+                    game(darkMode, "1.nono");
                     SDL_ShowWindow(win);
                 }
+                if (isClicked(ev.button.x, ev.button.y, level2.pos)) {
+                    SDL_HideWindow(win);
+                    game(darkMode, "2.nono");
+                    SDL_ShowWindow(win);
+                }
+                if (isClicked(ev.button.x, ev.button.y, level3.pos)) {
+                    SDL_HideWindow(win);
+                    game(darkMode, "3.nono");
+                    SDL_ShowWindow(win);
+                }
+                if (isClicked(ev.button.x, ev.button.y, level4.pos)) {
+                    SDL_HideWindow(win);
+                    game(darkMode, "4.nono");
+                    SDL_ShowWindow(win);
+                }
+
             }
         }
 
@@ -205,7 +228,12 @@ int menuStart() {
             SDL_RenderClear(rend);
         }
         renderButton(rend, darkMode, toggleDarkMode);
-        renderButton(rend, darkMode, toggleMusic);
+        renderButton(rend, darkMode, level1);
+        renderButton(rend, darkMode, level2);
+        renderButton(rend, darkMode, level3);
+        renderButton(rend, darkMode, level4);
+        renderButton(rend, darkMode, level1);
+        renderButton(rend, darkMode, level1);
 
 
         SDL_RenderPresent(rend);
@@ -223,14 +251,14 @@ int menuStart() {
 }
 
 
-int game(bool darkMode) {
+int game(bool darkMode, string level) {
     Uint32 flags = SDL_WINDOW_SHOWN;
     SDL_Window* win = SDL_CreateWindow("Menu",
                                        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                        600, 600, flags);
     SDL_Renderer* rend = SDL_CreateRenderer(win, -1, 0);
-    TTF_Font* font = TTF_OpenFont("mononoki.ttf", 30);
-
+    TTF_Font* font = TTF_OpenFont("mononoki.ttf", 20);
+    TTF_Font* timerFont = TTF_OpenFont("mononoki.ttf", 42);
 
     menuButton toggleDarkMode;
     toggleDarkMode.pos = {250, 20, 30, 30};
@@ -249,9 +277,9 @@ int game(bool darkMode) {
     }
     int m = 15;
     int n = 15;
-    readNono(slnptr,"ff",&m,&n);
-    int hintm = m/2 + (m%2);
-    int hintn = n/2 + (n%2);
+    readNono(slnptr,level,&m,&n);
+    int hintm = 8;
+    int hintn = 8;
     //cout << m << " " << n << endl;
 
     // Определение чисел cверху
@@ -298,7 +326,7 @@ int game(bool darkMode) {
     }
 
     // вывод для проверки работы
-    /*
+
     for (int i = 0; i < 15; ++i) {
         for (int j = 0; j < 15; ++j) {
             cout << sln[i][j];
@@ -321,8 +349,8 @@ int game(bool darkMode) {
             cout << leftHints[i][j] << "\t";
         }
         cout << endl;
-    }*/
-    cout << "FFFFFFF ";
+    }
+    //cout << "FFFFFFF ";
     cout << maxTopHint << " " << maxLeftHint;
 
     SDL_Rect temp;
@@ -374,7 +402,7 @@ int game(bool darkMode) {
             SDL_SetRenderDrawColor(rend, 250, 250, 250, 0);
             SDL_RenderClear(rend);
         }
-        renderTimer(5,10,t2-t1,font,rend,darkMode);
+        renderTimer(5,10,t2-t1,timerFont,rend,darkMode);
         renderButton(rend, darkMode, toggleDarkMode);
 
         for (int i = 0; i < m; i++) {
@@ -408,5 +436,6 @@ int game(bool darkMode) {
 
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
-    return 1;
+
+    return 0;
 }
